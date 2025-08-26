@@ -1,0 +1,29 @@
+{
+  "metadata": {
+    "kernelspec": {
+      "name": "xpython",
+      "display_name": "Python 3.13 (XPython)",
+      "language": "python"
+    },
+    "language_info": {
+      "file_extension": ".py",
+      "mimetype": "text/x-python",
+      "name": "python",
+      "version": "3.13.1"
+    }
+  },
+  "nbformat_minor": 5,
+  "nbformat": 4,
+  "cells": [
+    {
+      "id": "5f4a488b-0010-4bf7-9ae0-3f299a81755b",
+      "cell_type": "code",
+      "source": "import pandas as pd\nimport numpy as np\nimport re\nimport matplotlib.pyplot as plt\n\n# Load dataset\ndf = pd.read_excel(\"DA -Task 2..xlsx\", sheet_name=0)\n\n# ---- Data Cleaning ----\nfor c in df.select_dtypes(include=['object']).columns:\n    df[c] = df[c].str.strip().str.title()\n\nfor c in df.columns:\n    if df[c].dtype == 'object':\n        conv = pd.to_numeric(df[c], errors='ignore')\n        if conv.dtype != 'object':\n            df[c] = conv\n\nfor c in df.columns:\n    if df[c].dtype.kind in 'biufc':\n        df[c].fillna(df[c].median(), inplace=True)\n    else:\n        df[c].fillna(df[c].mode()[0], inplace=True)\n\n# ---- Tagging from Free Text ----\nfailure_conditions = [\"overheating\",\"noise\",\"vibration\",\"leak\",\"corrosion\",\"short\",\"stall\",\"drift\",\"crash\"]\ncomponents = [\"battery\",\"motor\",\"inverter\",\"sensor\",\"connector\",\"harness\",\"module\",\"ecu\"]\n\ndef clean_text(s):\n    return re.sub(r\"[^a-z0-9 ]\",\" \",str(s).lower())\n\ndef extract_tags(text):\n    text = clean_text(text)\n    cond = [w for w in failure_conditions if w in text]\n    comp = [w for w in components if w in text]\n    return pd.Series({\n        \"tags_failure_conditions\": \", \".join(cond),\n        \"tags_components\": \", \".join(comp)\n    })\n\nfree_text_cols = [c for c in df.columns if df[c].dtype == 'object' and df[c].nunique() > 50]\ndf = pd.concat([df, df[free_text_cols].astype(str).agg(\" \".join, axis=1).apply(extract_tags)], axis=1)\n\n# ---- Visualizations ----\ndf[\"tags_failure_conditions\"].value_counts().head(10).plot(kind=\"bar\", title=\"Top Failure Conditions\")\nplt.show()\n\ndf[\"tags_components\"].value_counts().head(10).plot(kind=\"bar\", title=\"Top Components\")\nplt.show()\n\nif \"REPORTING_COST\" in df.columns:\n    df[\"REPORTING_COST\"].plot(kind=\"hist\", bins=20, title=\"Repair Cost Distribution\")\n    plt.show()\n\n# Save cleaned & tagged dataset\ndf.to_excel(\"Task2_Cleaned_Tagged_Output.xlsx\", index=False)\n",
+      "metadata": {
+        "trusted": true
+      },
+      "outputs": [],
+      "execution_count": null
+    }
+  ]
+}
