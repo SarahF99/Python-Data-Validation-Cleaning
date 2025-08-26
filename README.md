@@ -12,20 +12,24 @@ A Python-based solution for validating, cleaning, and transforming CSV data. The
 ✔ Validate formats
 ✔ Save cleaned data to a new CSV file
 
+
 ---
 
-## **Requirements**
+### **Requirements**
 
-* Python 3.x
-* pandas library
+* **Python 3.x**
+* **pandas** library
+* **matplotlib** library
+* **numpy** library
 
-Install dependencies:
+**Install dependencies:**
 
 ```bash
-pip install pandas
+pip install pandas matplotlib numpy
 ```
 
 ---
+
 
 ## **Folder Structure**
 
@@ -37,9 +41,3 @@ data-cleaning-script/
 └── sample_data.csv        # Example input data
 ```
 
----
-
-
----
-
-✅ Do you want me to **write the actual Python code** for this and give you a **ready-to-upload ZIP with README + code + sample CSV**? Or just the code here?
